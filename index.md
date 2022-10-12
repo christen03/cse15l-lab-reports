@@ -17,7 +17,7 @@ It will prompt you with a password, which you can then enter. **Don't worry if y
 
 Once logged in, your terminal should look something like this:
 
-![alt text](https://github.com/christen03/cse15l-lab-reports/blob/main/remotely-connected.png/)
+![alt text](https://github.com/christen03/cse15l-lab-reports/blob/main/lab1images/remotely-connected.png/)
 
 ### Step 3 - Trying Some Commands
 
@@ -30,7 +30,7 @@ Time to have some fun! There are a variety of commands that you can run now, her
 
 I've run a few commands here to show what some potential outputs could look like: 
 
-![alt text](https://github.com/christen03/cse15l-lab-reports/blob/main/trying-some-commands.png/)
+![alt text](https://github.com/christen03/cse15l-lab-reports/blob/main/lab1images/trying-some-commands.png/)
 
 ### Step 4 - Moving Files with `scp`
 
@@ -53,24 +53,24 @@ The name for this file will be *NameAndLocation.java*, so Ill compile it with `j
 
 When all is said and done, this is what my output looks like:
 
-![alt text](https://github.com/christen03/cse15l-lab-reports/blob/main/java-running.png/)
+![alt text](https://github.com/christen03/cse15l-lab-reports/blob/main/lab1images/java-running.png/)
 
 Now to copy it over to the remote server computer, we can run the command:
 `scp NameAndLocation.java cs15lfa22eh@ieng6.ucsd.edu:~/`
 The terminal should output something similar to this:
 
-![alt text](https://github.com/christen03/cse15l-lab-reports/blob/main/scp-copying.png/)
+![alt text](https://github.com/christen03/cse15l-lab-reports/blob/main/lab1images/scp-copying.png/)
 
 Now when we log back into the remote server and run the commands `javac NameAndLocation.java` and `java NameAndLocation` you`ll have the file copied over and runnable in the remote server! 
 
-![alt text](https://github.com/christen03/cse15l-lab-reports/blob/main/scp-copied.png/)
+![alt text](https://github.com/christen03/cse15l-lab-reports/blob/main/lab1images/scp-copied.png/)
 
 ### Step 5 - Setting up an SSH Key
 
 Now everything we've seen may seem cool and all, but isn't it a little annoying and slow that we have to retype in our password everytime we login or copy a file over? If we want to find a faster method, SSH keys are our solution. This is commonly used in work environments that interact with server code often. To set up a ssh key, we want to logout and start in the local server, so `logout` if you have to! The first command will be:
 '$ ssh-keygen`
 
-![alt text](https://github.com/christen03/cse15l-lab-reports/blob/main/ssh-key-generate.png/)
+![alt text](https://github.com/christen03/cse15l-lab-reports/blob/main/lab1images/ssh-key-generate.png/)
 
 It will then ask you a few questions such as which file to save the key in and what you want the passpharse to be. You can just hit enter on both and leave them empty. This will leave the key to get saved in the default file, which in my case is:
 `/Users/christenxie/.ssh/id_rsa`
@@ -82,11 +82,11 @@ In the local server, we want to copy over the key, so we will use `scp` again. F
 `$ scp /Users/christenxie/.ssh/id_rsa.pub cs15lfa22eh@ieng6.ucsd.edu:~/.ssh/authorized_keys`
 Make sure you use the path you saved the key in for your first path! It will run the copy for a second: 
 
-![alt text](https://github.com/christen03/cse15l-lab-reports/blob/main/ssh-key-login.png/)
+![alt text](https://github.com/christen03/cse15l-lab-reports/blob/main/lab1images/ssh-key-login.png/)
 
 However, now after we're done, we can `ssh` and `scp` fully without passwords!
 
-![alt text](https://github.com/christen03/cse15l-lab-reports/blob/main/ssh-key-loggedin.png/)
+![alt text](https://github.com/christen03/cse15l-lab-reports/blob/main/lab1images/ssh-key-loggedin.png/)
 
 *See? No password required!*
 
@@ -99,7 +99,7 @@ Will create a directory called *test* in the remote server!
 
 2. Putting semicolons after each command in a terminal will all you to run multiple commands at once:  
 
-![alt text](https://github.com/christen03/cse15l-lab-reports/blob/main/optimize.png/)
+![alt text](https://github.com/christen03/cse15l-lab-reports/blob/main/lab1images/optimize.png/)
 
 Here, I copied *NameAndLocation.java* into a new file called *NameAndLocation2.java* and compiled it using `javac` in the same command, just split by a semicolon. Then, next command I executed it using `java`
 
