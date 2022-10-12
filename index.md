@@ -40,12 +40,14 @@ Start by typing `logout` into the terminal to logout of the remote computer.
 
 Now in VSCode, we can make a new file through the File -> New File. Fill it out with whatever you want, but in this example, I'm going to be using the following code. 
 
-`class NameAndLocation{`
-`   public static void main(String[] args) {`
-`        System.out.println("Hi! my name is " + System.getProperty("user.name") + " and my home is `
-`+ System.getProperty("user.home"));`
-`    }`
-`}`
+```
+class NameAndLocation{
+   public static void main(String[] args) {
+        System.out.println("Hi! my name is " + System.getProperty("user.name") + " and my home is 
++ System.getProperty("user.home"));
+    }
+}
+```
 
 The name for this file will be *NameAndLocation.java*, so Ill compile it with `javac NameAndLocation.java`, then run it with `java NameAndLocation`.
 
