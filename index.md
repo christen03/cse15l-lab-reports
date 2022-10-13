@@ -1,114 +1,205 @@
-# CSE 15L Lab 1 Report - Christen Xie  
+# CSE 15L Week 3 Lab Report - Christen Xie  
 
-Welcome to **CSE 15L!** In this tutorial, we'll be going over remote access and how we can work with files through the terminal! Note that this tutorial asssumes that you are running MacOS.
+Welcome back! This lab report will go over two things: **Simplest Search Engine** and **Debugging and Test Cases**
 
-### Step 1 - Download Visual Studio Code
-First, go to the website: *https://code.visualstudio.com/*. There, you'll find instructions on how to download and install Visual Studio Code for your computer. Once you've finished installing and downloading, your screen should look something like this:
-![alt text](https://github.com/christen03/cse15l-lab-reports/blob/main/lab1images/vscode.png?raw=true)
-
-### Step 2 - Remotely Connecting
-
-Once you have Visual Studio Code downloaded and open, we can start connecting to the remote computer. To start off, we need to open a new terminal inside VSCode. To do this, on top of your screen you should find a *Terminal* button. Cilck that and a drop-down menu will appear where you will find a *New Terminal* option. Once the new terminal is opened, type in the following command, but replacing the section before **@ieng6.ucsd.edu** with your course-account. 
-For this example, we will be using the following command:
-
-`$ ssh cs15lfa22eh@ieng6.ucsd.edu`, it should look like this: 
-
-![alt text](https://github.com/christen03/cse15l-lab-reports/blob/main/lab1images/ssh-run.png?raw=true)
-It will prompt you with a password, which you can then enter. **Don't worry if you don't see anything here when you type, it won't show on your screen, but the computer is taking your inputs!**
-
-Once logged in, your terminal should look something like this:
-
-![alt text](https://github.com/christen03/cse15l-lab-reports/blob/main/lab1images/remotely-connected.png?raw=true)
-
-### Step 3 - Trying Some Commands
-
-Time to have some fun! There are a variety of commands that you can run now, heres a list of potential examples:
-
-- `cd ~` -> change directory, tilde is the home directory.
-- `ls ` -> lists all directories in the working directory
-- `ls <directory>` -> lists all directories in a given directory.
-- `mkdir (directory name)` -> makes a directory with the given name.
-
-I've run a few commands here to show what some potential outputs could look like: 
-
-![alt text](https://github.com/christen03/cse15l-lab-reports/blob/main/lab1images/trying-some-commands.png?raw=true)
-
-### Step 4 - Moving Files with `scp`
-
-One of the most important benefits of working remotely is that you can copy files from the remote computer back to your local computer, or vice versa. While there are a variety of ways to do this, we're going to do it with the `scp` command here. For this example, we're going to start in the local computer
-
-Start by typing `logout` into the terminal to logout of the remote computer.
-
-Now in VSCode, we can make a new file through the File -> New File. Fill it out with whatever you want, but in this example, I'm going to be using the following code. 
+## Week 2 - Simplest Search Engine 
+In week 2, we devleoped a "search engine" where a user could add their inputs into and could query themselves. When a string was added, it would be stored in a list, and a query could be any string. When queried, the seach engine would display any string that contained the search as a substring.
+Here is my running code behind the search engine.
 
 ```
-class NameAndLocation{
-   public static void main(String[] args) {
-        System.out.println("Hi! my name is " + System.getProperty("user.name") + " and my home is 
-+ System.getProperty("user.home"));
+import java.io.IOException;
+import java.net.URI;
+import java.util.ArrayList;
+
+class Handler implements URLHandler{
+    ArrayList<String> items = new ArrayList<String>();
+    public String handleRequest(URI url){
+        if(url.getPath().equals("/")){
+            return String.format("Welcome to the search engine!");
+        }
+        else if(url.getPath().equals("/add")){
+            String[] parameters = url.getQuery().split("=");
+            if(parameters[0].equals("s")){
+                items.add(parameters[1]);
+                return String.format(parameters[1]+" added to engine!");
+            }
+            else{
+                return "No item found to add!";
+            }
+        }
+            else if(url.getPath().equals("/search")){
+                ArrayList<String> found = new ArrayList<>();
+                String[] parameters = url.getQuery().split("=");
+                if(parameters[0].equals("s")){
+                    for(int i=0; i<items.size(); i++){
+                        if (items.get(i).contains(parameters[1])){
+                            found.add(items.get(i));
+                        }
+                    }
+                }
+                if(found.size()!=0){
+                return String.format(found.toString());
+                }
+                else{
+                    return "Nothing found!";
+                }
+
+            }
+            else{
+               return "404 Not found!";
+            }
+    }
+}
+
+    class SearchEngine {
+        public static void main(String[] args) throws IOException {
+            if(args.length == 0){
+                System.out.println("Missing port number! Try any number between 1024 to 49151");
+                return;
+            }
+    
+            int port = Integer.parseInt(args[0]);
+    
+            Server.start(port, new Handler());
+        }
+    }
+```
+
+### Code in Action
+So how does this work? It starts in the terminal, where it's compiled then run with your choice of port number. I used port #1225, but feel free to choose your own!
+
+![alt text](https://github.com/christen03/cse15l-lab-reports/blob/main/lab2images/run-server.png?raw=true)
+
+#### Running The Server
+You can then find the server running online at the URL shown, for me it's *http://localhost:1225*.
+
+Now the homepage looks something like this:
+
+![alt text](https://github.com/christen03/cse15l-lab-reports/blob/main/lab2images/homepage.png?raw=true)
+
+#### Adding to Search Engine
+To **add** something to the search engine, we can simply add **/add?s=[wordToAdd]** into the URL. For example, if I wanted to add *apple*, my new URL would be **http://localhost:1225/add?s=apple**. 
+For this example, I'm going to add "apple", "pear", "grape", and berry. My URLs to add look like
+- http://localhost:1225/add?s=apple (apple)
+- http://localhost:1225/add?s=pear (pear)
+- http://localhost:1225/add?s=grape (grape)
+- http://localhost:1225/add?s=berry (berry)
+
+The output on the page should look something like this (with whatever you're adding):
+
+![alt text](https://github.com/christen03/cse15l-lab-reports/blob/main/lab2images/adding-engine.png?raw=true)
+
+This works because it runs in the `else if(url.getPath().equals("/search"))` of the code. Since the path is what is after the domain, we put `/search` as the path. This matches the condition of `getPath().equals("/search)`, and enters if statement.
+Inside, we again create a new String array, parameters that splits everything before and after the "=" into an element in the array. If the first element (or string before the "=") is "s" (which it is in our case) the engine will then take the second element of the array (or string after the "=") and loop through the entire added word list. It will return any string in the added word list that contains the string after "=" in a substring. If it can't find any string, it will return that nothing is found.
+
+#### Querying Search Engine
+
+To **query** something to the search engine, we can simply add **/search?s=[stringToQuery]** into the URL. For example, if I wanted to query for words that contained *i*, my new URL would be **http://localhost:1225/serach?s=i**. 
+Continuing from the first example, I want to find anything that contains the letter "a". My query URL looks like:
+
+*http://localhost:1225/serach?s=a*
+
+The output on the page should look something like this:
+
+![alt text](https://github.com/christen03/cse15l-lab-reports/blob/main/lab2images/search.png?raw=true)
+
+This worked! Since apple, pear, and grape have "a", but berry does not. 
+
+This works because it runs in the `else if(url.getPath().equals("/add"))` of the code. Since the path is what is after the domain, we put `/add` as the path. This matches the condition of `getPath().equals("/add)`, and enters if statement.
+Inside, we create a new String array, parameters that splits everything before and after the "=" into an element in the array. If the first element (or string before the "=") is "s" (which it is in our case) the engine will add the second element of the array (or the string after the "="). Otherwise, it will fail and return that nothing is added.
+
+#### Error!
+
+What happens if the path is neither `/search` or `/add`? The code will then pass around both else if statements and go to the bottom else statement, which will just return a **404 not found error**. For example, if I plug in `/dance` as a path, I get this:
+
+![alt text](https://github.com/christen03/cse15l-lab-reports/blob/main/lab2images/server-fail.png?raw=true)
+
+## Week 3 Testing and Debugging
+
+In week 3, we found some erroneous code and with tests, were able to pinpoint some issues and debug them. Here are two examples and walkthroughs of failed then fixed code:
+
+### Example 1 - Reversing an Array
+
+This was the original failure-inducing input, the idea is to take an array and reverse the elements inside of it. 
+
+```
+  static int[] reversed(int[] arr) {
+    int[] newArray = new int[arr.length];
+    for(int i = 0; i < arr.length; i += 1) {
+      arr[i] = newArray[arr.length - i - 1];
+    }
+    return arr;
+  }
+```
+
+When I ran the following test, it failed.
+
+```
+  @Test 
+  public void test(){
+    int[] input={3,2,3};
+    assertArrayEquals(new int[]{3,2,3}, ArrayExamples.reversed(input));
+  }
+```
+
+The **symptom**, or visual failing output it displayed was
+`arrays first differed at element [0]; expected:<3> but was:<0>`
+This means that for a correctly reversed array, the element at index 0, (first item) is 3, but the faulty code resulted in it being 0.
+
+The bug fix was to flip what was on each side of the "=" in the for loop, so 
+`arr[i] = newArray[arr.length - i - 1];` ->  `newArray[arr.length - i - 1] = arr[i];`
+as well as to return `newArray` instead of `arr` (the original array), so 
+`return arr;` -> `return newArray;`.
+
+This symptom was being caused by this bug because a new array wass being created and it is being iterated through backwards, but the original array’s values were getting changed to the new array’s values, which are all 0. There was nothing changing the new array’s values to the reverse of the original array. Then, in addition, the original array was being returned.
+
+### Example 2 - Filtering a List
+
+This was the original failure-inducing input, the idea is to take a list and filter for a certain type of string inside of it. (Remove any string that doesn't match the condition.)
+
+```  
+static List<String> filter(List<String> list, StringChecker sc) {
+    List<String> result = new ArrayList<>();
+    for(String s: list) {
+      if(sc.checkString(s)) {
+        result.add(0, s);
+      }
+    }
+    return result;
+  }
+```
+When I ran the following test, it failed:
+
+```
+@Test 
+    public void testFiler(){
+List<String> array_input=new ArrayList<String>();
+array_input.add("apple");
+array_input.add("pear");
+array_input.add("grape");
+array_input.add("berry");
+ArrayList<String> correct_input=new ArrayList<>();
+correct_input.add("apple");
+correct_input.add("pear");
+correct_input.add("grape");
+array_input=ListExamples.filter(array_input, new HasLetterA());
+assertArrayEquals(array_input.toArray(), correct_input.toArray());
+}
+```
+
+This is the `StringChecker` I used, (HasLetterA):
+
+```
+class HasLetterA implements StringChecker{
+    @Override
+    public boolean checkString(String s){
+        return s.contains("a");
     }
 }
 ```
 
-The name for this file will be *NameAndLocation.java*, so Ill compile it with `javac NameAndLocation.java`, then run it with `java NameAndLocation`.
+The **symptom**, or visual failing element it displayed was
 
-When all is said and done, this is what my output looks like:
+`
 
-![alt text](https://github.com/christen03/cse15l-lab-reports/blob/main/lab1images/java-running.png?raw=true)
-
-Now to copy it over to the remote server computer, we can run the command:
-`scp NameAndLocation.java cs15lfa22eh@ieng6.ucsd.edu:~/`
-The terminal should output something similar to this:
-
-![alt text](https://github.com/christen03/cse15l-lab-reports/blob/main/lab1images/scp-copying.png?raw=true)
-
-Now when we log back into the remote server and run the commands `javac NameAndLocation.java` and `java NameAndLocation` you`ll have the file copied over and runnable in the remote server! 
-
-![alt text](https://github.com/christen03/cse15l-lab-reports/blob/main/lab1images/scp-copied.png?raw=true)
-
-### Step 5 - Setting up an SSH Key
-
-Now everything we've seen may seem cool and all, but isn't it a little annoying and slow that we have to retype in our password everytime we login or copy a file over? If we want to find a faster method, SSH keys are our solution. This is commonly used in work environments that interact with server code often. To set up a ssh key, we want to logout and start in the local server, so `logout` if you have to! The first command will be:
-'$ ssh-keygen`
-
-![alt text](https://github.com/christen03/cse15l-lab-reports/blob/main/lab1images/ssh-key-generate.png?raw=true)
-
-It will then ask you a few questions such as which file to save the key in and what you want the passpharse to be. You can just hit enter on both and leave them empty. This will leave the key to get saved in the default file, which in my case is:
-`/Users/christenxie/.ssh/id_rsa`
-Now that the files are created, we need to copy over a public key from our local computer to the server. So naturally, the first step is to login.
-`$ ssh cs15lfa22eh@ieng6.ucsd.edu` and enter your password.
-Now that we're in the server, let's make a ssh directory.
-`$ mkdir .ssh`. Now we can logout again.
-In the local server, we want to copy over the key, so we will use `scp` again. For me, the command is 
-`$ scp /Users/christenxie/.ssh/id_rsa.pub cs15lfa22eh@ieng6.ucsd.edu:~/.ssh/authorized_keys`
-Make sure you use the path you saved the key in for your first path! It will run the copy for a second: 
-
-![alt text](https://github.com/christen03/cse15l-lab-reports/blob/main/lab1images/ssh-key-login.png?raw=true)
-
-However, now after we're done, we can `ssh` and `scp` fully without passwords!
-
-![alt text](https://github.com/christen03/cse15l-lab-reports/blob/main/lab1images/ssh-key-loggedin.png?raw=true)
-
-*See? No password required!*
-
-### Step 6 - Optimizing Remote Running
-
-A few tips for optimizing your commands:
-1. If you put a command in quotes at the end of an `ssh`, you can simply run the command on the remote server. For example, if you run:
-`$ ssh cs15lfa22@ieng6.ucsd.edu "mkdir test"`
-Will create a directory called *test* in the remote server!
-
-2. Putting semicolons after each command in a terminal will all you to run multiple commands at once:  
-
-![alt text](https://github.com/christen03/cse15l-lab-reports/blob/main/lab1images/optimize.png?raw=true)
-
-Here, I copied *NameAndLocation.java* into a new file called *NameAndLocation2.java* and compiled it using `javac` in the same command, just split by a semicolon. Then, next command I executed it using `java`
-
-3. The up arrow will allow you to recall commands run before, hitting it once will recall the previous command, two times the second previous, three times third, etc.
-
-## Conclusion
-
-Now that you have all the information to remotely connect to another computer and work with file systems, you're ready to take on CSE 15L! Best of luck!
-
-**Christen Xie**
 
