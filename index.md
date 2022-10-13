@@ -172,7 +172,7 @@ When I ran the following test, it failed:
 
 ```
 @Test 
-    public void testFiler(){
+    public void testFilter(){
 List<String> array_input=new ArrayList<String>();
 array_input.add("apple");
 array_input.add("pear");
@@ -198,8 +198,19 @@ class HasLetterA implements StringChecker{
 }
 ```
 
-The **symptom**, or visual failing element it displayed was
+The **symptom**, or visual failing element it displayed was:
 
-`
+```
+1) testFilter(ListTests)
+arrays first differed at element [0]; expected:<[grap]e> but was:<[appl]e>
+```
+This means that for a correctly reversed array, the element at index 0, (first item) is grape, but the faulty code resulted in it being apple.
 
+The bug fix was to fix the `result.add` line in the listTests file. Because before, when a string element would pass the string checker, it would add the element at index 0, pushing all elements currently in the list back. This would essentially reverse the array when filtering. However, if the code is changed from
+`result.add(0, s);` -> `result.add(0)`,
+it will add the new string to the back of the list recreating the original list. 
+
+Thanks for reading this week's lab report, it was fun to make :)
+
+**Christen Xie**
 
