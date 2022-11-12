@@ -1,214 +1,87 @@
-# CSE 15L Week 3 Lab Report - Christen Xie  
+# CSE 15L Week 5 Lab Report - Christen Xie  
 
-Welcome back! This lab report will go over two things: **Simplest Search Engine** and **Debugging and Test Cases**
+Welcome back! This lab report will go over the `less` command.
 
-## Week 2 - Simplest Search Engine 
-In week 2, we devleoped a "search engine" where a user could add their inputs into and could query themselves. When a string was added, it would be stored in a list, and a query could be any string. When queried, the seach engine would display any string that contained the search as a substring.
-Here is my running code behind the search engine.
+The `less` command is used to display contents of a file or output, but only one page at a time. So if I were to use this command on a large file, such as `chapter 13.4` in 911reports, it would output this: 
 
-```
-import java.io.IOException;
-import java.net.URI;
-import java.util.ArrayList;
+![alt text](https://github.com/christen03/cse15l-lab-reports/blob/main/lab3images/originalless.png?raw=true)
 
-class Handler implements URLHandler{
-    ArrayList<String> items = new ArrayList<String>();
-    public String handleRequest(URI url){
-        if(url.getPath().equals("/")){
-            return String.format("Welcome to the search engine!");
-        }
-        else if(url.getPath().equals("/add")){
-            String[] parameters = url.getQuery().split("=");
-            if(parameters[0].equals("s")){
-                items.add(parameters[1]);
-                return String.format(parameters[1]+" added to engine!");
-            }
-            else{
-                return "No item found to add!";
-            }
-        }
-            else if(url.getPath().equals("/search")){
-                ArrayList<String> found = new ArrayList<>();
-                String[] parameters = url.getQuery().split("=");
-                if(parameters[0].equals("s")){
-                    for(int i=0; i<items.size(); i++){
-                        if (items.get(i).contains(parameters[1])){
-                            found.add(items.get(i));
-                        }
-                    }
-                }
-                if(found.size()!=0){
-                return String.format(found.toString());
-                }
-                else{
-                    return "Nothing found!";
-                }
+But there are a lot more possible command-line options with this less command that we're going to look at today!
 
-            }
-            else{
-               return "404 Not found!";
-            }
-    }
-}
+## Option 1: -n/-N
 
-    class SearchEngine {
-        public static void main(String[] args) throws IOException {
-            if(args.length == 0){
-                System.out.println("Missing port number! Try any number between 1024 to 49151");
-                return;
-            }
-    
-            int port = Integer.parseInt(args[0]);
-    
-            Server.start(port, new Handler());
-        }
-    }
-```
+The **-n and -N** command tags are used to modify the line numbers when viewing the text file.  For example, if I'm in my `./technical` directory already and I type in the command:
 
-### Code in Action
-So how does this work? It starts in the terminal, where it's compiled then run with your choice of port number. I used port #1225, but feel free to choose your own!
+`less -N government/Media/Annual_Fee.txt`, I would get the following output: 
 
-![alt text](https://github.com/christen03/cse15l-lab-reports/blob/main/lab2images/run-server.png?raw=true)
+![alt text](https://github.com/christen03/cse15l-lab-reports/blob/main/lab3images/annualFeeLineNumbers.png?raw=true)
 
-#### Running The Server
-You can then find the server running online at the URL shown, for me it's *http://localhost:1225*.
+The **-N** in the command made the line numbers show up. This is extremely useful when viewing many text files, especially if you're editing and need find a line to edit. However, if you're just in it for viewing and don't want line numbers, you can use **-n**.  If I run 
 
-Now the homepage looks something like this:
+`less -n government/Media/Annual_Fee.txt`, I get the following output: 
 
-![alt text](https://github.com/christen03/cse15l-lab-reports/blob/main/lab2images/homepage.png?raw=true)
+![alt text](https://github.com/christen03/cse15l-lab-reports/blob/main/lab3images/annualFeeNoNumbers.png?raw=true)
 
-#### Adding to Search Engine
-To **add** something to the search engine, we can simply add **/add?s=[wordToAdd]** into the URL. For example, if I wanted to add *apple*, my new URL would be **http://localhost:1225/add?s=apple**. 
-For this example, I'm going to add "apple", "pear", "grape", and berry. My URLs to add look like
-- http://localhost:1225/add?s=apple (apple)
-- http://localhost:1225/add?s=pear (pear)
-- http://localhost:1225/add?s=grape (grape)
-- http://localhost:1225/add?s=berry (berry)
+It's definitely a lot cleaner of a read. What if you are to run boht of the commands? Like what if my input command were to be
 
-The output on the page should look something like this (with whatever you're adding):
+`less -n -N government/Media/Anthem_Payout.txt`, I get the following output: 
 
-![alt text](https://github.com/christen03/cse15l-lab-reports/blob/main/lab2images/adding-engine.png?raw=true)
 
-This works because it runs in the `else if(url.getPath().equals("/search"))` of the code. Since the path is what is after the domain, we put `/search` as the path. This matches the condition of `getPath().equals("/search)`, and enters if statement.
-Inside, we again create a new String array, parameters that splits everything before and after the "=" into an element in the array. If the first element (or string before the "=") is "s" (which it is in our case) the engine will then take the second element of the array (or string after the "=") and loop through the entire added word list. It will return any string in the added word list that contains the string after "=" in a substring. If it can't find any string, it will return that nothing is found.
+![alt text](https://github.com/christen03/cse15l-lab-reports/blob/main/lab3images/anthemNumbers.png?raw=true)
 
-#### Querying Search Engine
+As you can see it's just going to be whichever input is second, so if I inputted `less -N -n government/Media/Anthem_Payout.txt` instead, there would be no line numbers.
 
-To **query** something to the search engine, we can simply add **/search?s=[stringToQuery]** into the URL. For example, if I wanted to query for words that contained *i*, my new URL would be **http://localhost:1225/serach?s=i**. 
-Continuing from the first example, I want to find anything that contains the letter "a". My query URL looks like:
+## Option 2: -p
 
-*http://localhost:1225/serach?s=a*
+The **-p** command is very useful when finding certain patterns of text in a file. You would use it along with a certain pattern and a file to find that text pattern in a file. For example if I inputted 
 
-The output on the page should look something like this:
+`less -p "different case" government/Alcohol_Problems/Session2-pdf.txt`, I get this:
 
-![alt text](https://github.com/christen03/cse15l-lab-reports/blob/main/lab2images/search.png?raw=true)
+![alt text](https://github.com/christen03/cse15l-lab-reports/blob/main/lab3images/differentcase.png?raw=true)
 
-This worked! Since apple, pear, and grape have "a", but berry does not. 
+It's really nice because what it directly finds the pattern of text, so if you're ever looking for a certain keyword inside a text file, you can use **-p**. Here's another example with the input 
 
-This works because it runs in the `else if(url.getPath().equals("/add"))` of the code. Since the path is what is after the domain, we put `/add` as the path. This matches the condition of `getPath().equals("/add)`, and enters if statement.
-Inside, we create a new String array, parameters that splits everything before and after the "=" into an element in the array. If the first element (or string before the "=") is "s" (which it is in our case) the engine will add the second element of the array (or the string after the "="). Otherwise, it will fail and return that nothing is added.
+`less -p "alcohol screening" government/Alcohol_Problems/Session4-pdf.txt`
 
-#### Error!
+![alt text](https://github.com/christen03/cse15l-lab-reports/blob/main/lab3images/screening.png?raw=true)
 
-What happens if the path is neither `/search` or `/add`? The code will then pass around both else if statements and go to the bottom else statement, which will just return a **404 not found error**. For example, if I plug in `/dance` as a path, I get this:
+As you can see, I looked for the pattern "alcohol screening" and it was highlighted for me. Now what if you search for a pattern that doesn't exist? What if I input 
 
-![alt text](https://github.com/christen03/cse15l-lab-reports/blob/main/lab2images/server-fail.png?raw=true)
+`less -p "alcohol screening fjldkfjslkdjflsjfls" government/Alcohol_Problems/Session4-pdf.txt`
 
-## Week 3 Testing and Debugging
+![alt text](https://github.com/christen03/cse15l-lab-reports/blob/main/lab3images/no_pattern.png?raw=true)
 
-In week 3, we found some erroneous code and with tests, were able to pinpoint some issues and debug them. Here are two examples and walkthroughs of failed then fixed code:
+You get a screen that says nothing was found, very useful for if you're looking for certain keywords! A very fast way to filter through files. 
 
-### Example 1 - Reversing an Array
+## Option 3 -s
 
-This was the original failure-inducing input, the idea is to take an array and reverse the elements inside of it. 
+The **-s** command input allows you to squeeze blank lines. For example, if I just open this file without **-s** I get this:
 
-```
-  static int[] reversed(int[] arr) {
-    int[] newArray = new int[arr.length];
-    for(int i = 0; i < arr.length; i += 1) {
-      arr[i] = newArray[arr.length - i - 1];
-    }
-    return arr;
-  }
-```
+`less government/About_LSC/State_Planning_Special_Report.txt`
 
-When I ran the following test, it failed.
+![alt text](https://github.com/christen03/cse15l-lab-reports/blob/main/lab3images/notusings.png?raw=true)
 
-```
-  @Test 
-  public void test(){
-    int[] input={3,2,3};
-    assertArrayEquals(new int[]{3,2,3}, ArrayExamples.reversed(input));
-  }
-```
+But if I use **-s**, it turns out:
+ 
+`less -s government/About_LSC/State_Planning_Special_Report.txt`
 
-The **symptom**, or visual failing output it displayed was
-`arrays first differed at element [0]; expected:<3> but was:<0>`
-This means that for a correctly reversed array, the element at index 0, (first item) is 3, but the faulty code resulted in it being 0.
+![alt text](https://github.com/christen03/cse15l-lab-reports/blob/main/lab3images/usings.png?raw=true)
 
-The bug fix was to flip what was on each side of the "=" in the for loop, so 
-`arr[i] = newArray[arr.length - i - 1];` ->  `newArray[arr.length - i - 1] = arr[i];`
-as well as to return `newArray` instead of `arr` (the original array), so 
-`return arr;` -> `return newArray;`.
+It compresses the file and makes it a lot cleaner to read!
+This becomes pretty helpful if you combine it with *-N* to make a clean file with lines:
 
-This symptom was being caused by this bug because a new array wass being created and it is being iterated through backwards, but the original array’s values were getting changed to the new array’s values, which are all 0. There was nothing changing the new array’s values to the reverse of the original array. Then, in addition, the original array was being returned.
+`less -s -N government/Gen_Account_Office/d01186g.txt` which outputs:
 
-### Example 2 - Filtering a List
+![alt text](https://github.com/christen03/cse15l-lab-reports/blob/main/lab3images/sAndN.png?raw=true)
 
-This was the original failure-inducing input, the idea is to take a list and filter for a certain type of string inside of it. (Remove any string that doesn't match the condition.)
+Of course, if you use it on a file that doesn't have a ton of spaces already, it doesn't do much.
 
-```  
-static List<String> filter(List<String> list, StringChecker sc) {
-    List<String> result = new ArrayList<>();
-    for(String s: list) {
-      if(sc.checkString(s)) {
-        result.add(0, s);
-      }
-    }
-    return result;
-  }
-```
-When I ran the following test, it failed:
+`less -s plos/journal.pbio.0020439.txt` will output: 
 
-```
-@Test 
-    public void testFilter(){
-List<String> array_input=new ArrayList<String>();
-array_input.add("apple");
-array_input.add("pear");
-array_input.add("grape");
-array_input.add("berry");
-ArrayList<String> correct_input=new ArrayList<>();
-correct_input.add("apple");
-correct_input.add("pear");
-correct_input.add("grape");
-array_input=ListExamples.filter(array_input, new HasLetterA());
-assertArrayEquals(array_input.toArray(), correct_input.toArray());
-}
-```
+![alt text](https://github.com/christen03/cse15l-lab-reports/blob/main/lab3images/plos.png?raw=true)
 
-This is the `StringChecker` I used, (HasLetterA):
+which is the same output with or without the -s.
 
-```
-class HasLetterA implements StringChecker{
-    @Override
-    public boolean checkString(String s){
-        return s.contains("a");
-    }
-}
-```
-
-The **symptom**, or visual failing element it displayed was:
-
-```
-1) testFilter(ListTests)
-arrays first differed at element [0]; expected:<[grap]e> but was:<[appl]e>
-```
-This means that for a correctly reversed array, the element at index 0, (first item) is grape, but the faulty code resulted in it being apple.
-
-The bug fix was to fix the `result.add` line in the listTests file. Because before, when a string element would pass the string checker, it would add the element at index 0, pushing all elements currently in the list back. This would essentially reverse the array when filtering. However, if the code is changed from
-`result.add(0, s);` -> `result.add(0)`,
-it will add the new string to the back of the list recreating the original list. 
 
 Thanks for reading this week's lab report, it was fun to make :)
 
