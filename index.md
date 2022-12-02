@@ -1,87 +1,49 @@
-# CSE 15L Week 5 Lab Report - Christen Xie  
+# CSE 15L Week 7 Lab Report - Christen Xie  
 
-Welcome back! This lab report will go over the `less` command.
+Welcome back! This lab report vim to edit text files.
+As a brief overview of vim, it's a very powerful text editor that can be run straight in your terminal! It can open a variety of files and is very versatile. Today, we'll be going over some uses and commands.
 
-The `less` command is used to display contents of a file or output, but only one page at a time. So if I were to use this command on a large file, such as `chapter 13.4` in 911reports, it would output this: 
+## Section 1 - Replacing text in vim
 
-![alt text](https://github.com/christen03/cse15l-lab-reports/blob/main/lab3images/originalless.png?raw=true)
+In this first example, we'll be taking a look at `DocSearchServer.java`. Here's a preview of the file:
 
-But there are a lot more possible command-line options with this less command that we're going to look at today!
+![alt text](https://github.com/christen03/cse15l-lab-reports/blob/main/lab4images/doc.png?raw=true)
 
-## Option 1: -n/-N
+It's not quite the whole file, but it shows the parts that we need. The task today is to change the parameter, `start` (and thus all variables `start`) to `base` using vim. The method to be edited is `getFiles`.
 
-The **-n and -N** command tags are used to modify the line numbers when viewing the text file.  For example, if I'm in my `./technical` directory already and I type in the command:
+There's a pretty cool command we can use and here the breakdown:
+`:%s/` will search the file for any text pattern coming after the `/`. so `:%s/hello` will serach the file for hello. 
+If we include another text pattern like `/hi` after this command, we can replace all instance of the first text pattern with the second. so 
+`:%s/hello/hi` will replace all instances of hello in the files with hi.
+Then, adding a `\gc` at the back will ask for confirmation before converting any string. So here, since we want to only alter the text in getFiles, we want to make sure we're not touching other methods, so I'm running the command:
 
-`less -N government/Media/Annual_Fee.txt`, I would get the following output: 
+`:%s/start/base/gc`
 
-![alt text](https://github.com/christen03/cse15l-lab-reports/blob/main/lab3images/annualFeeLineNumbers.png?raw=true)
+This will ask me if I want to replace each instance of `start`, as shown here: the cursor will jump to the first instance of start.
 
-The **-N** in the command made the line numbers show up. This is extremely useful when viewing many text files, especially if you're editing and need find a line to edit. However, if you're just in it for viewing and don't want line numbers, you can use **-n**.  If I run 
+![alt text](https://github.com/christen03/cse15l-lab-reports/blob/main/lab4images/edits.png?raw=true)
 
-`less -n government/Media/Annual_Fee.txt`, I get the following output: 
+The first 3 I will input `y` for yes, since they are part of the `getFiles` method, but since the last `start` is in a whole other method, I input `n` for no. (So `y` three times, then `n` once) Now look at our new method!:
 
-![alt text](https://github.com/christen03/cse15l-lab-reports/blob/main/lab3images/annualFeeNoNumbers.png?raw=true)
+![alt text](https://github.com/christen03/cse15l-lab-reports/blob/main/lab4images/edited.png?raw=true)
 
-It's definitely a lot cleaner of a read. What if you are to run boht of the commands? Like what if my input command were to be
+Remember to `:wq` to save and exit!
 
-`less -n -N government/Media/Anthem_Payout.txt`, I get the following output: 
+## Section 2 - Vim vs VSCode
 
+Obviously, another amazing text editor is VSCode, it's colorful, fun, and shows compiler errors. However, it can get really slow and annoying when running programs remotely. For this section, I decided to time myself making this same `DocSearchServer.java` edit and running it on VSCode and on Vim.
 
-![alt text](https://github.com/christen03/cse15l-lab-reports/blob/main/lab3images/anthemNumbers.png?raw=true)
+### VSCode
 
-As you can see it's just going to be whichever input is second, so if I inputted `less -N -n government/Media/Anthem_Payout.txt` instead, there would be no line numbers.
+For VSCode, the whole process took me about 7 seconds to make the edits, as I just hit `CMD+F`, then searched for `start` and replaced it with `base`. Then came the difficulties. I had to `scp` the file to the remote server, then log on to the remote server, then run it which added about another 15 seconds. It ended it a total of about **22** seconds.
 
-## Option 2: -p
+### Vim
 
-The **-p** command is very useful when finding certain patterns of text in a file. You would use it along with a certain pattern and a file to find that text pattern in a file. For example if I inputted 
+For Vim, since I was already logged it, it was very easy. I just typed in the command `:%s/start/base/gc`, and the edit was done. I typed in `:wq`, and then ran the test and it was all done. The whole process took me about **5** seconds.
 
-`less -p "different case" government/Alcohol_Problems/Session2-pdf.txt`, I get this:
+### Summary
 
-![alt text](https://github.com/christen03/cse15l-lab-reports/blob/main/lab3images/differentcase.png?raw=true)
-
-It's really nice because what it directly finds the pattern of text, so if you're ever looking for a certain keyword inside a text file, you can use **-p**. Here's another example with the input 
-
-`less -p "alcohol screening" government/Alcohol_Problems/Session4-pdf.txt`
-
-![alt text](https://github.com/christen03/cse15l-lab-reports/blob/main/lab3images/screening.png?raw=true)
-
-As you can see, I looked for the pattern "alcohol screening" and it was highlighted for me. Now what if you search for a pattern that doesn't exist? What if I input 
-
-`less -p "alcohol screening fjldkfjslkdjflsjfls" government/Alcohol_Problems/Session4-pdf.txt`
-
-![alt text](https://github.com/christen03/cse15l-lab-reports/blob/main/lab3images/no_pattern.png?raw=true)
-
-You get a screen that says nothing was found, very useful for if you're looking for certain keywords! A very fast way to filter through files. 
-
-## Option 3 -s
-
-The **-s** command input allows you to squeeze blank lines. For example, if I just open this file without **-s** I get this:
-
-`less government/About_LSC/State_Planning_Special_Report.txt`
-
-![alt text](https://github.com/christen03/cse15l-lab-reports/blob/main/lab3images/notusings.png?raw=true)
-
-But if I use **-s**, it turns out:
- 
-`less -s government/About_LSC/State_Planning_Special_Report.txt`
-
-![alt text](https://github.com/christen03/cse15l-lab-reports/blob/main/lab3images/usings.png?raw=true)
-
-It compresses the file and makes it a lot cleaner to read!
-This becomes pretty helpful if you combine it with *-N* to make a clean file with lines:
-
-`less -s -N government/Gen_Account_Office/d01186g.txt` which outputs:
-
-![alt text](https://github.com/christen03/cse15l-lab-reports/blob/main/lab3images/sAndN.png?raw=true)
-
-Of course, if you use it on a file that doesn't have a ton of spaces already, it doesn't do much.
-
-`less -s plos/journal.pbio.0020439.txt` will output: 
-
-![alt text](https://github.com/christen03/cse15l-lab-reports/blob/main/lab3images/plos.png?raw=true)
-
-which is the same output with or without the -s.
-
+Overall, while I do think Vim is cool, I'm not too familiar with the commands, and currently, I'm willing to take the 15 seconds of being irritated for a cleaner, and more visual text editor. I love being able to move my cursor around my code and use basic mac commands to edit my code, as well as easily spot compiler errors. But that's just me right now, as I get more used to Vim, I'm sure things will change. 
 
 Thanks for reading this week's lab report, it was fun to make :)
 
